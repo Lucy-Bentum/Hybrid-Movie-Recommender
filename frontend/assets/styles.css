@@ -1,0 +1,86 @@
+/* Background */
+
+body {
+    background: linear-gradient(180deg,#141414,#000000);
+    color: white;
+}
+
+/* Title */
+
+.main-title{
+    font-size:50px;
+    font-weight:800;
+    text-align:center;
+    color:#ff4b2b;
+}
+
+/* Search */
+
+.stSelectbox div{
+    border-radius:10px;
+}
+
+/* Recommendation header */
+
+.recommend-header{
+    font-size:28px;
+    font-weight:bold;
+    margin-top:30px;
+    padding:10px;
+    border-left:6px solid #ff4b2b;
+}
+
+/* Cards */
+
+.stExpander{
+    background:#1e1e1e;
+    border-radius:14px;
+    padding:10px;
+    margin-bottom:15px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.7);
+}
+
+/* Posters */
+
+.stImage img{
+    border-radius:10px;
+    border:2px solid #333;
+}
+
+/* Genres */
+
+.genre-badge{
+    display:inline-block;
+    padding:4px 10px;
+    margin:3px;
+    border-radius:15px;
+    background:linear-gradient(135deg,#ff416c,#ff4b2b);
+    font-size:12px;
+}
+
+/* Hover animation */
+
+.stExpander:hover{
+    transform:scale(1.01);
+    transition:0.2s;
+}
+
+section[data-testid="stSidebar"] button {
+    width: 100%;
+    background-color: #3a3b6d;
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 2px;
+    border: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+section[data-testid="stSidebar"] div {
+    margin-bottom: 2px !important;
+}
+
+section[data-testid="stSidebar"] button:hover {
+    background-color: #374151;
+    transform: scale(1.02);
+}
