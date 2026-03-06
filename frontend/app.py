@@ -1,5 +1,7 @@
-import streamlit as st
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import os
+import streamlit as st
 from dotenv import load_dotenv
 from backend.scripts.recommender import get_recommendations
 from backend.scripts.utils import load_movies_data, load_ratings_data, get_movie_poster, get_movie_trailer
