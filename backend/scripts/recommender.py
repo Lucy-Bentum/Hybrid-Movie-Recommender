@@ -1,6 +1,6 @@
-# backend/scripts/recommender.py
-
 import pandas as pd
+import os
+from dotenv import load_dotenv
 from .utils import (
     load_movies_data,
     load_ratings_data,
@@ -12,7 +12,8 @@ from .utils import (
 )
 from .hybrid_model import hybrid_recommend
 
-TMDB_API_KEY = "dea886bacb4fc5fafd80dc3de006b522"
+load_dotenv()
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 # ------------------------
 # Load datasets once

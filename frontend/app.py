@@ -1,14 +1,23 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "backend/scripts")))
+
 import streamlit as st
 from dotenv import load_dotenv
-from backend.scripts.recommender import get_recommendations
-from backend.scripts.utils import load_movies_data, load_ratings_data, get_movie_poster, get_movie_trailer
 
+from backend.scripts.utils import (
+    load_movies_data,
+    load_ratings_data,
+    get_recent_movies,
+    get_trending_movies,
+    get_movie_poster,
+    get_movie_trailer
+)
+from backend.scripts.recommender import get_recommendations
 
 load_dotenv()
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
 # ------------------------
 # Page config
 # ------------------------
@@ -23,8 +32,6 @@ st.set_page_config(
 # ------------------------
 with open("frontend/assets/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-    
 
 # ------------------------
 # Page title
@@ -48,19 +55,15 @@ if "history" not in st.session_state:
 # Sidebar: Recently Searched
 # ------------------------
 st.sidebar.title("🕘 Recently Searched")
-
 if st.session_state.history:
     for movie in st.session_state.history:
-        # Clickable button for each movie
         if st.sidebar.button(movie, key=movie):
             search_input = movie
+
 # ------------------------
 # Search bar with autocomplete
 # ------------------------
-search_input = st.selectbox(
-    "Search movie",
-    movie_titles
-)
+search_input = st.selectbox("Search movie", movie_titles)
 
 if search_input:
 
@@ -71,66 +74,69 @@ if search_input:
             st.session_state.history.pop()
 
     # ------------------------
-    # Fetch recommendations
+    # Fetch all movie lists first
     # ------------------------
-    with st.spinner("Finding best recommendations..."):
+    recent_movies = get_recent_movies()
+    trending_movies = get_trending_movies()
+
+    # ------------------------
+    # Display Recommendations (5 per row) WITH spinner
+    # ------------------------
+    with st.spinner("Fetching recommendations..."):
         recommended_movies = get_recommendations(search_input)
 
-    st.markdown("<div class='recommend-header'>Top Recommendations For You</div>", unsafe_allow_html=True)
+        st.markdown("<div class='recommend-header'>Top Recommendations For You</div>", unsafe_allow_html=True)
 
-    # Display recommended movies
-    for movie in recommended_movies:
-        with st.expander(f"{movie['title']} ⭐ {movie['avg_rating']:.1f}"):
+        for i in range(0, len(recommended_movies), 5):
+            row_movies = recommended_movies[i:i+5]
+            cols = st.columns(5)
+            for idx, movie in enumerate(row_movies):
+                with cols[idx]:
+                    st.image(movie.get('poster_url',"https://via.placeholder.com/500x750?text=No+Image"), width=200)
+                    st.subheader(movie['title'])
+                    st.write(f"Rating: {movie['avg_rating']:.1f}")
+                    st.write(movie['stars'])
+                    st.write(f"Popularity Score: {movie.get('popularity',0)}")
+                    if movie.get('genres'):
+                        badges = " ".join([f"<span class='genre-badge'>{g}</span>" for g in movie['genres'].split("|")])
+                        st.markdown(badges, unsafe_allow_html=True)
+                    if movie.get("trailer"):
+                        st.video(movie["trailer"])
 
-            cols = st.columns([1,3])
-
-            with cols[0]:
-                poster_url = movie.get('poster_url', "https://via.placeholder.com/500x750?text=No+Image")
-                st.image(poster_url, width=200)
-
-            with cols[1]:
+    # ------------------------
+    # Display Recent Movies (5 per row)
+    # ------------------------
+    st.markdown("## 🆕 Recent Movies")
+    for i in range(0, len(recent_movies), 5):
+        row_movies = recent_movies[i:i+5]
+        cols = st.columns(5)
+        for idx, movie in enumerate(row_movies):
+            with cols[idx]:
+                st.image(movie.get("poster"), width=200)
                 st.subheader(movie['title'])
-                st.write(f"Rating: {movie['avg_rating']:.1f}")
-                st.write(movie['stars'])
-                st.write(f"Popularity Score: {movie.get('popularity',0)}")
-
-                if 'genres' in movie and movie['genres']:
-                    genres = movie['genres'].split("|")
-                    badges = " ".join([f"<span class='genre-badge'>{g}</span>" for g in genres])
+                st.write(f"Rating: {movie.get('avg_rating',0):.1f}")
+                st.write(movie.get('stars',''))
+                if movie.get('genres'):
+                    badges = " ".join([f"<span class='genre-badge'>{g}</span>" for g in movie['genres'].split("|")])
                     st.markdown(badges, unsafe_allow_html=True)
-
                 if movie.get("trailer"):
                     st.video(movie["trailer"])
 
-# ------------------------
-# TRENDING MOVIES
-# ------------------------
-
-st.markdown("---")
-st.markdown("<div class='recommend-header'>🔥 Trending Movies</div>", unsafe_allow_html=True)
-
-trending_movies = [
-    "Avengers: Endgame",
-    "Spider-Man: No Way Home",
-    "The Dark Knight",
-    "Inception",
-    "Interstellar"
-]
-
-for title in trending_movies:
-
-    poster = get_movie_poster(title, TMDB_API_KEY)
-    trailer = get_movie_trailer(title, TMDB_API_KEY)
-
-    with st.expander(title):
-
-        cols = st.columns([1,3])
-
-        with cols[0]:
-            st.image(poster, width=200)
-
-        with cols[1]:
-            st.subheader(title)
-
-            if trailer:
-                st.video(trailer)
+    # ------------------------
+    # Display Trending Movies (5 per row)
+    # ------------------------
+    st.markdown("## 🔥 Trending Movies")
+    for i in range(0, len(trending_movies), 5):
+        row_movies = trending_movies[i:i+5]
+        cols = st.columns(5)
+        for idx, movie in enumerate(row_movies):
+            with cols[idx]:
+                st.image(movie.get("poster"), width=200)
+                st.subheader(movie['title'])
+                st.write(f"Rating: {movie.get('avg_rating',0):.1f}")
+                st.write(movie.get('stars',''))
+                if movie.get('genres'):
+                    badges = " ".join([f"<span class='genre-badge'>{g}</span>" for g in movie['genres'].split("|")])
+                    st.markdown(badges, unsafe_allow_html=True)
+                if movie.get("trailer"):
+                    st.video(movie["trailer"])

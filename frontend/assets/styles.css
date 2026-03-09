@@ -20,6 +20,47 @@ body {
     border-radius:10px;
 }
 
+/* Recent & Trending Movie Cards */
+.movie-card {
+    background: #1e1e1e;
+    border-radius: 14px;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    transform: scale(1.01);
+}
+
+/* Poster inside card */
+.movie-card img {
+    border-radius: 10px;
+    border: 2px solid #333;
+}
+
+/* Genres badge (same as recommendations) */
+.genre-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 3px;
+    border-radius: 15px;
+    background: linear-gradient(135deg,#ff416c,#ff4b2b);
+    font-size: 12px;
+}
+
+/* Movie title & rating */
+.movie-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.movie-rating {
+    margin-top: 2px;
+}
+
 /* Recommendation header */
 
 .recommend-header{
