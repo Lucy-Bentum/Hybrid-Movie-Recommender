@@ -54,6 +54,7 @@ def get_recommendations(user_input, top_n=10):
         movie_row = movies[movies['title'] == title]
         if movie_row.empty:
             continue
+
         movie_id = movie_row['movieId'].values[0]
         movie_ratings = ratings[ratings['movieId'] == movie_id]['rating']
 
@@ -77,7 +78,23 @@ def get_recommendations(user_input, top_n=10):
             "popularity": popularity
         })
 
+    # ------------------------
     # Sort by hybrid score
+    # ------------------------
     recommendations = sorted(recommendations, key=lambda x: x["score"], reverse=True)
+
+    # ------------------------
+    # Ensure searched movie appears first
+    # ------------------------
+    main_movie_data = None
+
+    for movie in recommendations:
+        if movie["title"] == main_movie:
+            main_movie_data = movie
+            break
+
+    if main_movie_data:
+        recommendations = [m for m in recommendations if m["title"] != main_movie]
+        recommendations.insert(0, main_movie_data)
 
     return recommendations[:top_n]
